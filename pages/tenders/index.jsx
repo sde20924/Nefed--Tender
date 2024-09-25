@@ -10,7 +10,6 @@ const Tenders = () => {
   const [tenders, setTenders] = useState([]);
   const [selectedTenderId, setSelectedTenderId] = useState(null); // Track which tender's menu is open
 
-  // Fetch tenders for the seller
   useEffect(() => {
     const fetchSellerTenders = async () => {
       try {
