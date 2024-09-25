@@ -1,0 +1,153 @@
+/* css/application.module.css */
+
+.app_details {
+  display: flex;
+  padding: 16px;
+  gap: 24px;
+}
+
+.left_card {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+.left_card h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.info_item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info_item label {
+  font-weight: bold;
+  color: #555;
+  flex-basis: 30%;
+}
+
+.info_item p {
+  margin: 0;
+  color: #777;
+  flex-basis: 70%;
+}
+
+.input_field {
+  width: 100%;
+  padding: 8px;
+  font-size: 1em;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.error {
+  color: red;
+  font-size: 0.85em;
+  margin-top: 5px;
+}
+
+.action_buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.action_button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.action_button:hover {
+  background-color: #0056b3;
+}
+
+.right_card {
+  width: 100%;
+  height: min-content;
+  max-width: 600px;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.right_card h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.document_list {
+  margin-bottom: 20px;
+}
+
+.document_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.document_item label {
+  font-weight: bold;
+  color: #555;
+}
+
+.document_item button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.document_item button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .app_details {
+    flex-direction: column;
+  }
+
+  .left_card,
+  .right_card {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .info_item {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .info_item label,
+  .info_item p {
+    flex-basis: auto;
+  }
+}
+
+@media (max-width: 999px) {
+  .app_details {
+    flex-wrap: wrap;
+  }
+}

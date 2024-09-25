@@ -1,0 +1,45 @@
+image: node:18
+
+stages:
+  - build
+  - test
+  - deploy
+
+cache:
+  paths:
+    - node_modules/
+
+before_script:
+  - npm install
+
+build:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - out
+
+test:
+  stage: test
+  script:
+    - npm run test
+  artifacts:
+    when: always
+    paths:
+      - test-reports
+
+deploy:
+  stage: deploy
+  script:
+    - apt-get update -y
+    - apt-get install -y lftp
+    - lftp -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST -e "set ftp:ssl-allow no; mirror -R out $REMOTE_DIR; quit"
+  only:
+    - master
+
+variables:
+  FTP_USERNAME: tenderapp@nafedtrackandtrace.com
+  FTP_PASSWORD: tender@2024
+  FTP_HOST: ftp.nafedtrackandtrace.com
+  REMOTE_DIR: /

@@ -1,0 +1,171 @@
+.app_details {
+  padding: 32px;
+  display: flex;
+  gap: 24px;
+}
+.left_card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+}
+.left_card h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.info_item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info_item label {
+  font-weight: bold;
+  color: #555;
+}
+
+.info_item p {
+  margin: 0;
+  color: #777;
+  text-align: right;
+}
+
+.info_item:last-child {
+  border-bottom: none;
+}
+
+.right_card {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+}
+
+.right_card h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.document_list {
+  margin-bottom: 20px;
+}
+
+.document_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.document_item label {
+  font-weight: bold;
+  color: #555;
+}
+
+.document_item button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.document_item button:hover {
+  background-color: #0056b3;
+}
+
+.membership_section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.membership_section h3 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.membership_select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.review_section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.review_section textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  resize: vertical;
+}
+
+.action_buttons,
+.reject_page_btn {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.action_buttons button,
+.reject_page_btn button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.action_buttons button:last-child {
+  background-color: #dc3545;
+}
+
+.action_buttons button:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 968px) {
+  .app_details {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .left_card,
+  .right_card {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+}
+@media (max-width: 568px) {
+  .app_details {
+    padding: 16px;
+  }
+  .left_card,
+  .right_card {
+    padding: 16px;
+  }
+}
