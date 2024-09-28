@@ -1,7 +1,7 @@
 import HeaderTitle from "@/components/HeaderTitle/HeaderTitle";
 import UserDashboard from "@/layouts/UserDashboard";
 import React, { useState, useEffect } from "react";
-import { callApiGet } from "@/utils/FetchApi";
+import { callApiGet , callApiPost ,callApiDelete } from "@/utils/FetchApi";
 import moment from "moment";
 import { useRouter } from 'next/router';
 
@@ -32,17 +32,42 @@ const Tenders = () => {
     setSelectedTenderId((prevSelectedId) => (prevSelectedId === tenderId ? null : tenderId));
   };
 
-  const handleMenuOptionClick = (option, tender) => {
+  const handleMenuOptionClick = async (option, tender) => {
     if (option === "edit") {
-      // Navigate to Edit Tender page with the tender ID as a query parameter
       router.push(`/tenders/editTenderForm?id=${tender.tender_id}`);
     } else if (option === "delete") {
-      // Handle the delete action here
-      console.log("Delete action for:", tender);
+      const confirmDelete = window.confirm("Are you sure you want to delete this tender?");
+      if (confirmDelete) {
+        try {
+          const response = await callApiDelete(`delete-tender/${tender.tender_id}`);
+          if (response.success) {
+            alert('Tender deleted successfully');
+            // Refetch tenders to update the list after deletion
+            // setTenders(tenders.filter(t => t.tender_id !== tender.tender_id));
+          }
+        } catch (error) {
+          console.error('Error deleting tender:', error);
+          alert('Failed to delete tender');
+        }
+      }
+    } else if (option === "clone") {
+      try {
+        const response = await callApiPost(`clone-tender/${tender.tender_id}`, {}); // Cloning still requires formData (even if empty)
+        if (response.success) {
+          alert('Tender cloned successfully');
+          // Optionally, refetch tenders to include the new cloned tender
+          fetchSellerTenders();
+        }
+      } catch (error) {
+        console.error('Error cloning tender:', error);
+        alert('Failed to clone tender');
+      }
     }
     setSelectedTenderId(null); // Close the menu after the option is selected
   };
   
+  
+
   
 
   return (
@@ -84,8 +109,14 @@ const Tenders = () => {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleMenuOptionClick("delete", tender)}
+                        onClick={() => handleMenuOptionClick("clone", tender)}
                         className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        clone
+                      </button>
+                      <button
+                        onClick={() => handleMenuOptionClick("delete", tender)}
+                        className="block w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100" 
                       >
                         Delete
                       </button>

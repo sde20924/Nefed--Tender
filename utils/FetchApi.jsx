@@ -55,6 +55,36 @@ const callApiPost = async (route, formData) => {
   }
 };
 
+// api for delete tender
+
+const callApiDelete = async (route) => {
+  console.log(`Calling DELETE for route: ${route}`);
+
+  try {
+    const response = await fetch(`http://localhost:8002/${route}`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.log("Error Data:", errorData); // Log server-side errors
+      throw new Error(errorData.msg || 'An error occurred while processing the request');
+    }
+
+    const data = await response.json();
+    console.log("Response Data:", data); // Log response data for verification
+    return data;
+  } catch (error) {
+    console.error('Error:', error.message);
+    throw error;
+  }
+};
+
+
 
 
 
@@ -177,4 +207,4 @@ const viewOfferingGetApi = async (route) => {
   return data;
 };
 
-export { callApi, callApiGet, callApiPost, uploadDocApi, vesselCallApi, vesselGetApi, portGetApi, commodityGetApi, commoditySearchGetApi, commoditycallApi, viewOfferingGetApi };
+export { callApi, callApiGet, callApiPost, uploadDocApi, vesselCallApi, vesselGetApi, portGetApi, commodityGetApi, commoditySearchGetApi, commoditycallApi, viewOfferingGetApi , callApiDelete };

@@ -32,34 +32,34 @@ const EditTenderForm = () => {
   const [description, setDescription] = useState("");
 
   const [tenderData, setTenderData] = useState({
-    name: '',
-    slug: '',
-    description: '',
+    name: "",
+    slug: "",
+    description: "",
     isFeatured: false,
     isPublished: false,
-    emdAmount: '',
-    emdLevelAmount: '',
+    emdAmount: "",
+    emdLevelAmount: "",
     attachments: [],
-    currency: '',
-    startingPrice: '',
-    quantity: '',
-    destinationPort: '',
-    bagSize: '',
-    bagType: '',
-    measurementUnit: '',
+    currency: "",
+    startingPrice: "",
+    quantity: "",
+    destinationPort: "",
+    bagSize: "",
+    bagType: "",
+    measurementUnit: "",
     applicationStart: null,
     applicationEnd: null,
     auctionStart: null,
     auctionEnd: null,
-    extensionMinutes: '',
+    extensionMinutes: "",
     extendedAt: null,
-    timeExtension: '',
-    extensionBeforeEndtime: '',
-    minDecrementValue: '',
-    timerExtendedValue: '',
-    qtySplittingCriteria: '',
-    counterOfferTimer: '',
-    customForm: {}
+    timeExtension: "",
+    extensionBeforeEndtime: "",
+    minDecrementValue: "",
+    timerExtendedValue: "",
+    qtySplittingCriteria: "",
+    counterOfferTimer: "",
+    customForm: {},
   });
 
   useEffect(() => {
@@ -67,39 +67,43 @@ const EditTenderForm = () => {
       const fetchTenderDetails = async () => {
         try {
           const response = await callApiGet(`/tender/${id}`);
-              const data=response.data;
+          const data = response.data;
+          console.log(data.attachments);
 
-            setTenderData({
-              name: data.tender_title.trim(),
-              slug: data.tender_slug.trim(),
-              description: data.tender_desc.trim(),
-              isFeatured: data.tender_opt === 'true',
-              isPublished: data.tender_opt === 'true',
-              emdAmount: data.emd_amt.toString(),
-              emdLevelAmount: data.emt_lvl_amt.trim(),
-              attachments: data.attachments,
-              currency: data.currency.trim(),
-              startingPrice: data.start_price.toString(),
-              quantity: data.qty.toString(),
-              destinationPort: data.dest_port.trim(),
-              bagSize: data.bag_size.trim(),
-              bagType: data.bag_type.trim(),
-              measurementUnit: data.measurement_unit.trim(),
-              applicationStart: new Date(parseInt(data.app_start_time) * 1000),
-              applicationEnd: new Date(parseInt(data.app_end_time) * 1000),
-              auctionStart: new Date(parseInt(data.auct_start_time) * 1000),
-              auctionEnd: new Date(parseInt(data.auct_end_time) * 1000),
-              extensionMinutes: data.time_frame_ext.toString(),
-              extendedAt: data.extended_at ? new Date(parseInt(data.extended_at) * 1000) : null,
-              timeExtension: data.amt_of_ext.toString(),
-              extensionBeforeEndtime: data.aut_auct_ext_bfr_end_time.toString(),
-              minDecrementValue: data.min_decr_bid_val.toString(),
-              timerExtendedValue: data.timer_ext_val.toString(),
-              qtySplittingCriteria: data.qty_split_criteria.trim(),
-              counterOfferTimer: data.counter_offr_accept_timer.toString(),
-              customForm: data.custom_form
-            });
-        //   }
+          setTenderData({
+            name: data.tender_title.trim(),
+            slug: data.tender_slug.trim(),
+            description: data.tender_desc.trim(),
+            isFeatured: data.tender_opt === "true",
+            isPublished: data.tender_opt === "true",
+            emdAmount: data.emd_amt.toString(),
+            emdLevelAmount: data.emt_lvl_amt.trim(),
+            attachments: data.attachments,
+            currency: data.currency.trim(),
+            startingPrice: data.start_price.toString(),
+            quantity: data.qty.toString(),
+            destinationPort: data.dest_port.trim(),
+            bagSize: data.bag_size.trim(),
+            bagType: data.bag_type.trim(),
+            measurementUnit: data.measurement_unit.trim(),
+            applicationStart: new Date(parseInt(data.app_start_time) * 1000),
+            applicationEnd: new Date(parseInt(data.app_end_time) * 1000),
+            auctionStart: new Date(parseInt(data.auct_start_time) * 1000),
+            auctionEnd: new Date(parseInt(data.auct_end_time) * 1000),
+            extensionMinutes: data.time_frame_ext.toString(),
+            extendedAt: data.extended_at
+              ? new Date(parseInt(data.extended_at) * 1000)
+              : null,
+            timeExtension: data.amt_of_ext.toString(),
+            extensionBeforeEndtime: data.aut_auct_ext_bfr_end_time.toString(),
+            minDecrementValue: data.min_decr_bid_val.toString(),
+            timerExtendedValue: data.timer_ext_val.toString(),
+            qtySplittingCriteria: data.qty_split_criteria.trim(),
+            counterOfferTimer: data.counter_offr_accept_timer.toString(),
+            customForm: data.custom_form,
+          });
+
+          console.log("attachments data here :", attachments);
         } catch (error) {
           console.error("Error fetching tender details:", error);
         }
@@ -307,8 +311,6 @@ const EditTenderForm = () => {
   const [applicationStart, setApplicationStart] = useState(null);
   const [applicationEnd, setApplicationEnd] = useState(null);
 
-  
-
   const parseDate = (date) => (date ? new Date(date) : null);
   const handleApplicationStartChange = (date) => {
     setApplicationStart(date);
@@ -318,7 +320,7 @@ const EditTenderForm = () => {
   };
 
   const handleApplicationEndChange = (date) => {
-    setApplicationEnd(parseDate(date)); 
+    setApplicationEnd(parseDate(date));
   };
 
   // Helper function to get the minimum time for the end date picker
@@ -341,55 +343,62 @@ const EditTenderForm = () => {
     e.preventDefault();
 
     // Generate a random tender_id using current time
-    const tender_id = `tender_${new Date().getTime()}`; // Prefixing with 'tender_' to ensure uniqueness
-     
+    // const tender_id = `tender_${new Date().getTime()}`; // Prefixing with 'tender_' to ensure uniqueness
 
     // Prepare form data to send to backend
     const formData = {
-      tender_title: name, // Title of the tender
-      tender_slug: slug, // URL-friendly version of the title
-      tender_desc: description, // Description of the tender
-      tender_cat: 'testing', // Default to 'testing' if not applicable
-      tender_opt: isPublished, // Tender option, e.g., publish status
-      emd_amt: emdAmount, // EMD Amount
-      emt_lvl_amt: emdLevelAmount, // EMD Level Amount
-      attachments: attachments, // attachments if needed
-      custom_form: JSON.stringify(formFields), // Stringify custom form fields if needed
-      currency, // Currency type
-      start_price: startingPrice, // Starting price for the tender
-      qty: quantity, // Quantity
-      dest_port: destinationPort, // Destination port
-      bag_size: bagSize, // Size of the bag 
-      bag_type: bagType, // Type of the bag
-      measurement_unit: measurmentUnit, // Measurement unit
-      app_start_time: Math.floor(new Date(applicationStart).getTime() / 1000), // Application start time as Unix timestamp
-      app_end_time: Math.floor(new Date(applicationEnd).getTime() / 1000), // Application end time as Unix timestamp
-      auct_start_time: Math.floor(new Date(auctionStart).getTime() / 1000), // Auction start time as Unix timestamp
-      auct_end_time: Math.floor(new Date(auctionEnd).getTime() / 1000), // Auction end time as Unix timestamp
-      time_frame_ext: extensionMinutes, // Time frame for extension
-      extended_at: extendedAt ? Math.floor(new Date(extendedAt).getTime() / 1000) : null, // Extended time in Unix timestamp or null
-      amt_of_ext: timeExtension, // Amount of time extension
-      aut_auct_ext_bfr_end_time: extensionBeforeEndtime, // Auction extension before end time
-      min_decr_bid_val: minDecrementValue, // Minimum decrement bid value
-      timer_ext_val: timerExtendedValue, // Timer extended value
-      qty_split_criteria: qtySplittingCriteria, // Quantity splitting criteria
-      counter_offr_accept_timer: counterOfferTimer, // Counter offer acceptance timer
-      img_url: image ? URL.createObjectURL(image) : " ", // Image URL created from the uploaded file
-      auction_type: null, // Set to null if not applicable
-      tender_id: tender_id , // Generate a random tender ID based on the current timestamp if not provided
-      audi_key: null, // Set to null if not applicable
+      tender_title: tenderData.name, // Title of the tender
+      tender_slug: tenderData.slug, // URL-friendly version of the title
+      tender_desc: tenderData.description, // Description of the tender
+      tender_cat: "testing", // Default to 'testing' if not applicable
+      tender_opt: tenderData.isPublished, // Tender option, e.g., publish status
+      emd_amt: tenderData.emdAmount, // EMD Amount
+      emt_lvl_amt: tenderData.emdLevelAmount, // EMD Level Amount
+      attachments: tenderData.attachments, // Attachments if needed
+      custom_form: JSON.stringify(tenderData.customForm), // Stringify custom form fields if needed
+      currency: tenderData.currency, // Currency type
+      start_price: tenderData.startingPrice, // Starting price for the tender
+      qty: tenderData.quantity, // Quantity
+      dest_port: tenderData.destinationPort, // Destination port
+      bag_size: tenderData.bagSize, // Size of the bag
+      bag_type: tenderData.bagType, // Type of the bag
+      measurement_unit: tenderData.measurementUnit, // Measurement unit
+      app_start_time: tenderData.applicationStart
+        ? Math.floor(new Date(tenderData.applicationStart).getTime() / 1000)
+        : null, // Application start time as Unix timestamp
+      app_end_time: tenderData.applicationEnd
+        ? Math.floor(new Date(tenderData.applicationEnd).getTime() / 1000)
+        : null, // Application end time as Unix timestamp
+      auct_start_time: tenderData.auctionStart
+        ? Math.floor(new Date(tenderData.auctionStart).getTime() / 1000)
+        : null, // Auction start time as Unix timestamp
+      auct_end_time: tenderData.auctionEnd
+        ? Math.floor(new Date(tenderData.auctionEnd).getTime() / 1000)
+        : null, // Auction end time as Unix timestamp
+      time_frame_ext: tenderData.extensionMinutes, // Time frame for extension
+      extended_at: tenderData.extendedAt
+        ? Math.floor(new Date(tenderData.extendedAt).getTime() / 1000)
+        : null, // Extended time in Unix timestamp or null
+      amt_of_ext: tenderData.timeExtension, // Amount of time extension
+      aut_auct_ext_bfr_end_time: tenderData.extensionBeforeEndtime, // Auction extension before end time
+      min_decr_bid_val: tenderData.minDecrementValue, // Minimum decrement bid value
+      timer_ext_val: tenderData.timerExtendedValue, // Timer extended value
+      qty_split_criteria: tenderData.qtySplittingCriteria, // Quantity splitting criteria
+      counter_offr_accept_timer: tenderData.counterOfferTimer, // Counter offer acceptance timer
+      img_url: tenderData.image ? URL.createObjectURL(tenderData.image) : " ", // Image URL created from the uploaded file
+      auction_type: "null", // Auction type, set to null if not applicable
+      audi_key: tenderData.audiKey, // Audio key, set to null if not applicable
     };
-    
 
     console.log("form data here 1", formData);
 
     try {
-      const response = await callApiPost("create_new_tender", formData);
+      const response = await callApiPost(`update-tender/${id}`, formData);
       console.log("responses: ", response);
       alert(response.msg);
     } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("Failed to create tender.");
+      console.error("Error updating form:", error);
+      alert("Failed to update tender.");
     }
   };
 
@@ -421,7 +430,9 @@ const EditTenderForm = () => {
                   type="text"
                   id="name"
                   value={tenderData.name}
-                  onChange={(e) => setTenderData({...tenderData, name: e.target.value})}
+                  onChange={(e) =>
+                    setTenderData({ ...tenderData, name: e.target.value })
+                  }
                   placeholder="Enter Name"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   required
@@ -454,7 +465,9 @@ const EditTenderForm = () => {
                 </label>
                 <ReactQuill
                   value={tenderData.description}
-                  onChange={(value) => setTenderData({...tenderData, description: value})}
+                  onChange={(value) =>
+                    setTenderData({ ...tenderData, description: value })
+                  }
                   placeholder="Enter description"
                   className="bg-white"
                   required
@@ -501,12 +514,19 @@ const EditTenderForm = () => {
                           </p>
                         </>
                       ) : (
-                        <div className="flex justify-center">
+                        <div className="flex flex-col items-center">
                           <img
                             src={URL.createObjectURL(image)}
                             alt="Uploaded"
-                            className="max-h-32"
+                            className="max-h-32 mb-4"
                           />
+                          <button
+                            type="button"
+                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                            onClick={() => setImage(null)} // Set image state to null to allow a new upload
+                          >
+                            Change Image
+                          </button>
                         </div>
                       )}
                     </div>
@@ -522,36 +542,53 @@ const EditTenderForm = () => {
                 <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                   <h2 className="text-2xl font-bold mb-4">Quick Options</h2>
                   <div className="flex justify-between items-center mb-4">
+                    {/* Featured Option */}
                     <div className="flex items-center">
                       <label htmlFor="featured" className="mr-3 text-gray-700">
                         Featured
                       </label>
                       <button
-                        onClick={handleFeaturedChange}
+                        onClick={() =>
+                          setTenderData((prevData) => ({
+                            ...prevData,
+                            isFeatured: !prevData.isFeatured, // Toggle isFeatured in tenderData
+                          }))
+                        }
                         className={`${
-                          isFeatured ? "bg-blue-500" : "bg-gray-300"
+                          tenderData.isFeatured ? "bg-blue-500" : "bg-gray-300"
                         } relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none`}
                       >
                         <span
                           className={`${
-                            isFeatured ? "translate-x-6" : "translate-x-1"
+                            tenderData.isFeatured
+                              ? "translate-x-6"
+                              : "translate-x-1"
                           } inline-block h-4 w-4 transform bg-white rounded-full transition-transform duration-200`}
                         />
                       </button>
                     </div>
+
+                    {/* Publish Option */}
                     <div className="flex items-center">
                       <label htmlFor="publish" className="mr-3 text-gray-700">
                         Publish
                       </label>
                       <button
-                        onClick={handlePublishChange}
+                        onClick={() =>
+                          setTenderData((prevData) => ({
+                            ...prevData,
+                            isPublished: !prevData.isPublished, // Toggle isPublished in tenderData
+                          }))
+                        }
                         className={`${
-                          isPublished ? "bg-blue-500" : "bg-gray-300"
+                          tenderData.isPublished ? "bg-blue-500" : "bg-gray-300"
                         } relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none`}
                       >
                         <span
                           className={`${
-                            isPublished ? "translate-x-6" : "translate-x-1"
+                            tenderData.isPublished
+                              ? "translate-x-6"
+                              : "translate-x-1"
                           } inline-block h-4 w-4 transform bg-white rounded-full transition-transform duration-200`}
                         />
                       </button>
@@ -559,6 +596,7 @@ const EditTenderForm = () => {
                   </div>
                 </div>
               </div>
+
               {/* EMD Details Section */}
               <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 <h2 className="text-2xl font-bold mb-4">EMD Details</h2>
@@ -574,7 +612,12 @@ const EditTenderForm = () => {
                     type="number"
                     id="emdAmount"
                     value={tenderData.emdAmount}
-                    onChange={(e) => setEmdAmount(e.target.value)}
+                    onChange={(e) =>
+                      setTenderData({
+                        ...tenderData,
+                        emdAmount: e.target.value,
+                      })
+                    }
                     placeholder="Enter EMD Amount"
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     required
@@ -595,7 +638,12 @@ const EditTenderForm = () => {
                     type="number"
                     id="emdLevelAmount"
                     value={tenderData.emdLevelAmount}
-                    onChange={(e) => setEmdLevelAmount(e.target.value)}
+                    onChange={(e) =>
+                      setTenderData({
+                        ...tenderData,
+                        emdLevelAmount: e.target.value,
+                      })
+                    }
                     placeholder="Enter EMD Amount"
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     required
@@ -608,7 +656,7 @@ const EditTenderForm = () => {
               <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 <h2 className="text-2xl font-bold mb-4">Attachments</h2>
 
-                {attachments.map((attachment, index) => (
+                {tenderData.attachments.map((attachment, index) => (
                   <div key={index} className="mb-6 border-b pb-4">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg font-semibold">
@@ -616,11 +664,31 @@ const EditTenderForm = () => {
                       </h3>
                       <button
                         type="button"
-                        onClick={
-                          index === 0
-                            ? handleAddAttachment
-                            : () => handleRemoveAttachment(index)
-                        }
+                        onClick={() => {
+                          if (index === 0) {
+                            // Handle Add Attachment
+                            setTenderData((prevData) => ({
+                              ...prevData,
+                              attachments: [
+                                ...prevData.attachments,
+                                {
+                                  key: "",
+                                  extension: "",
+                                  maxFileSize: "",
+                                  label: "",
+                                },
+                              ],
+                            }));
+                          } else {
+                            // Handle Remove Attachment
+                            setTenderData((prevData) => ({
+                              ...prevData,
+                              attachments: prevData.attachments.filter(
+                                (_, i) => i !== index
+                              ),
+                            }));
+                          }
+                        }}
                         className={`${
                           index === 0 ? "bg-green-500" : "bg-red-500"
                         } text-white p-2 rounded-full`}
@@ -636,10 +704,17 @@ const EditTenderForm = () => {
                       <input
                         type="text"
                         placeholder="Enter Key (Spaces not allowed)"
-                        value={attachment.key}
-                        onChange={(e) =>
-                          handleInputChange(index, "key", e.target.value)
-                        }
+                        value={attachment.key || ""} // Ensure a default value if undefined
+                        onChange={(e) => {
+                          setTenderData((prevData) => ({
+                            ...prevData,
+                            attachments: prevData.attachments.map((att, i) =>
+                              i === index
+                                ? { ...att, key: e.target.value }
+                                : att
+                            ),
+                          }));
+                        }}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         required
                       />
@@ -651,14 +726,17 @@ const EditTenderForm = () => {
                           Enter Extension
                         </label>
                         <select
-                          value={attachment.extension}
-                          onChange={(e) =>
-                            handleInputChange(
-                              index,
-                              "extension",
-                              e.target.value
-                            )
-                          }
+                          value={attachment.extension || ""}
+                          onChange={(e) => {
+                            setTenderData((prevData) => ({
+                              ...prevData,
+                              attachments: prevData.attachments.map((att, i) =>
+                                i === index
+                                  ? { ...att, extension: e.target.value }
+                                  : att
+                              ),
+                            }));
+                          }}
                           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                           required
                         >
@@ -668,7 +746,7 @@ const EditTenderForm = () => {
                           <option value="jpg">
                             image/png,image/jpg,image/jpeg
                           </option>
-                          <option value="png">application/pdf</option>
+                          <option value="pdf">application/pdf</option>
                         </select>
                       </div>
 
@@ -679,14 +757,17 @@ const EditTenderForm = () => {
                         <input
                           type="number"
                           placeholder="Enter File size"
-                          value={attachment.maxFileSize}
-                          onChange={(e) =>
-                            handleInputChange(
-                              index,
-                              "maxFileSize",
-                              e.target.value
-                            )
-                          }
+                          value={attachment.maxFileSize || ""}
+                          onChange={(e) => {
+                            setTenderData((prevData) => ({
+                              ...prevData,
+                              attachments: prevData.attachments.map((att, i) =>
+                                i === index
+                                  ? { ...att, maxFileSize: e.target.value }
+                                  : att
+                              ),
+                            }));
+                          }}
                           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                           required
                         />
@@ -700,10 +781,17 @@ const EditTenderForm = () => {
                       <input
                         type="text"
                         placeholder="Enter Image Label"
-                        value={attachment.label}
-                        onChange={(e) =>
-                          handleInputChange(index, "label", e.target.value)
-                        }
+                        value={attachment.label || ""}
+                        onChange={(e) => {
+                          setTenderData((prevData) => ({
+                            ...prevData,
+                            attachments: prevData.attachments.map((att, i) =>
+                              i === index
+                                ? { ...att, label: e.target.value }
+                                : att
+                            ),
+                          }));
+                        }}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       />
                     </div>
@@ -789,7 +877,12 @@ const EditTenderForm = () => {
                     <select
                       id="currency"
                       value={tenderData.currency}
-                      onChange={(e) => setCurrency(e.target.value)}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          currency: e.target.value,
+                        })
+                      }
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
                     >
@@ -810,7 +903,12 @@ const EditTenderForm = () => {
                       type="number"
                       id="startingPrice"
                       value={tenderData.startingPrice}
-                      onChange={(e) => setStartingPrice(e.target.value)}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          startingPrice: e.target.value,
+                        })
+                      }
                       placeholder="Enter Starting Price"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -827,8 +925,13 @@ const EditTenderForm = () => {
                     <input
                       type="number"
                       id="quantity"
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value)}
+                      value={tenderData.quantity}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          quantity: e.target.value,
+                        })
+                      }
                       placeholder="Enter Quantity"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -845,8 +948,13 @@ const EditTenderForm = () => {
                     <input
                       type="text"
                       id="destinationPort"
-                      value={destinationPort}
-                      onChange={(e) => setDestinationPort(e.target.value)}
+                      value={tenderData.destinationPort}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          destinationPort: e.target.value,
+                        })
+                      }
                       placeholder="Enter Destination Port"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -863,8 +971,13 @@ const EditTenderForm = () => {
                     <input
                       type="text"
                       id="bagSize"
-                      value={bagSize}
-                      onChange={(e) => setBagSize(e.target.value)}
+                      value={tenderData.bagSize}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          bagSize: e.target.value,
+                        })
+                      }
                       placeholder="Enter Bag Size"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -881,7 +994,12 @@ const EditTenderForm = () => {
                       type="text"
                       id="bagType"
                       value={tenderData.bagType}
-                      onChange={(e) => setBagType(e.target.value)}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          bagType: e.target.value,
+                        })
+                      }
                       placeholder="Enter Bag Type"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -898,7 +1016,12 @@ const EditTenderForm = () => {
                       type="text"
                       id="measurmentUnit"
                       value={tenderData.measurementUnit}
-                      onChange={(e) => setMeasurmentUnit(e.target.value)}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          measurementUnit: e.target.value,
+                        })
+                      }
                       placeholder="Enter Measurment Unit"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -912,7 +1035,12 @@ const EditTenderForm = () => {
                     <div className="w-full">
                       <DatePicker
                         selected={tenderData.applicationStart}
-                        onChange={(date) => setTenderData({...tenderData, applicationStart: date})}
+                        onChange={(date) =>
+                          setTenderData({
+                            ...tenderData,
+                            applicationStart: date,
+                          })
+                        }
                         showTimeSelect
                         dateFormat="MM/dd/yyyy hh:mm aa"
                         placeholderText="mm/dd/yyyy --:-- --"
@@ -932,7 +1060,9 @@ const EditTenderForm = () => {
                     <div className="w-full">
                       <DatePicker
                         selected={tenderData.applicationEnd}
-                        onChange={(date) => setTenderData({...tenderData, applicationEnd: date})}
+                        onChange={(date) =>
+                          setTenderData({ ...tenderData, applicationEnd: date })
+                        }
                         showTimeSelect
                         dateFormat="MM/dd/yyyy hh:mm aa"
                         placeholderText="mm/dd/yyyy --:-- --"
@@ -958,8 +1088,10 @@ const EditTenderForm = () => {
                     </p>
                     <div className="w-full">
                       <DatePicker
-                        selected={auctionStart}
-                        onChange={(date) => setAuctionStart(date)}
+                        selected={tenderData.auctionStart}
+                        onChange={(date) =>
+                          setTenderData({ ...tenderData, auctionStart: date })
+                        }
                         showTimeSelect
                         dateFormat="MM/dd/yyyy hh:mm aa"
                         placeholderText="mm/dd/yyyy --:-- --"
@@ -983,8 +1115,10 @@ const EditTenderForm = () => {
                     </p>
                     <div className="w-full">
                       <DatePicker
-                        selected={auctionEnd}
-                        onChange={(date) => setAuctionEnd(date)}
+                        selected={tenderData.auctionEnd}
+                        onChange={(date) =>
+                          setTenderData({ ...tenderData, auctionEnd: date })
+                        }
                         showTimeSelect
                         dateFormat="MM/dd/yyyy hh:mm aa"
                         placeholderText="mm/dd/yyyy --:-- --"
@@ -1006,8 +1140,13 @@ const EditTenderForm = () => {
                     </p>
                     <input
                       type="number"
-                      value={extensionMinutes}
-                      onChange={(e) => setExtensionMinutes(e.target.value)}
+                      value={tenderData.extensionMinutes}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          extensionMinutes: e.target.value,
+                        })
+                      }
                       placeholder="Enter Auto Auction Extension Minutes"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -1024,8 +1163,10 @@ const EditTenderForm = () => {
                     </p>
                     <div className="w-full">
                       <DatePicker
-                        selected={extendedAt}
-                        onChange={(date) => setExtendedAt(date)}
+                        selected={tenderData.extendedAt}
+                        onChange={(date) =>
+                          setTenderData({ ...tenderData, extendedAt: date })
+                        }
                         showTimeSelect
                         dateFormat="MM/dd/yyyy hh:mm aa"
                         placeholderText="mm/dd/yyyy --:-- --"
@@ -1046,8 +1187,13 @@ const EditTenderForm = () => {
                     </p>
                     <input
                       type="number"
-                      value={timeExtension}
-                      onChange={(e) => setTimeExtension(e.target.value)}
+                      value={tenderData.timeExtension}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          timeExtension: e.target.value,
+                        })
+                      }
                       placeholder="Enter Auto Auction Extension Number Time"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -1065,9 +1211,12 @@ const EditTenderForm = () => {
                     </p>
                     <input
                       type="number"
-                      value={extensionBeforeEndtime}
+                      value={tenderData.extensionBeforeEndtime}
                       onChange={(e) =>
-                        setExtensionBeforeEndtime(e.target.value)
+                        setTenderData({
+                          ...tenderData,
+                          extensionBeforeEndtime: e.target.value,
+                        })
                       }
                       placeholder="Enter Auto Auction Extension Before Endtime"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -1085,8 +1234,13 @@ const EditTenderForm = () => {
                     </p>
                     <input
                       type="number"
-                      value={minDecrementValue}
-                      onChange={(e) => setMinDecrementValue(e.target.value)}
+                      value={tenderData.minDecrementValue}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          minDecrementValue: e.target.value,
+                        })
+                      }
                       placeholder="Enter Counter Offer Acceptance Timer"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -1104,8 +1258,13 @@ const EditTenderForm = () => {
                     </p>
                     <input
                       type="number"
-                      value={timerExtendedValue}
-                      onChange={(e) => setTimerExtendedValue(e.target.value)}
+                      value={tenderData.timerExtendedValue}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          timerExtendedValue: e.target.value,
+                        })
+                      }
                       placeholder="Enter Timer Extended Value"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -1124,8 +1283,13 @@ const EditTenderForm = () => {
                     </p>
                     <input
                       type="number"
-                      value={qtySplittingCriteria}
-                      onChange={(e) => setQtySplittingCriteria(e.target.value)}
+                      value={tenderData.qtySplittingCriteria}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          qtySplittingCriteria: e.target.value,
+                        })
+                      }
                       placeholder="Enter Qty Splitting Criteria"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -1143,8 +1307,13 @@ const EditTenderForm = () => {
                     </p>
                     <input
                       type="number"
-                      value={counterOfferTimer}
-                      onChange={(e) => setCounterOfferTimer(e.target.value)}
+                      value={tenderData.counterOfferTimer}
+                      onChange={(e) =>
+                        setTenderData({
+                          ...tenderData,
+                          counterOfferTimer: e.target.value,
+                        })
+                      }
                       placeholder="Enter Counter Offer Acceptance Timer"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       required
@@ -1161,7 +1330,7 @@ const EditTenderForm = () => {
               type="submit"
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              Edit 
+              Edit
             </button>
           </div>
         </form>
