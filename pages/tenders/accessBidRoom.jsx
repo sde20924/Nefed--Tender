@@ -123,6 +123,10 @@ const AccessBidRoom = () => {
       setIsAuctionLive(false);
       setAuctionEnded(true); // Auction has ended
       setTimeLeft("Auction is closed");
+      // Automatically announce the winner when auction ends
+      // if (lBidUserId) {
+        announceWinner();
+      // }
     }
   };
 
@@ -178,7 +182,9 @@ const AccessBidRoom = () => {
     try {
       const response = await callApiPost("bid/submit", {
         tender_id: tenderId, // Pass the tender ID
-        bid_amount: bidAmount, // Pass the bid amount
+        bid_amount: bidAmount,  // Pass the bid amount
+        fob_amount : fobAmount,  
+        freight_amount : freightAmount
       });
 
       if (response.success) {
@@ -225,6 +231,34 @@ const AccessBidRoom = () => {
     setAmountInWords("");
   };
 
+  //winner announce than update the table 
+
+  const announceWinner = async () => {
+    try {
+      // Create the formData object with necessary details
+      const formData = {
+        winner_user_id: lBidUserId,
+        qty_secured: tender.qty_split_criteria,
+        round: 1,
+        status: "sold",
+      };
+  
+      // Call the API using callApiPost function
+      const response = await callApiPost(`tender/announce-winner/${tenderId}`, formData);
+  
+      if (response.success) {
+        toast.success("Winner announced successfully!");
+        fetchBids(); // Refresh the bid list to see updated status
+      } else {
+        toast.error("Failed to announce winner. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error announcing winner:", error.message);
+      toast.error("Error announcing winner. Please try again.");
+    }
+  };
+  
+
   // Render the position box showing the lowest bid or L1 status
   const renderPositionBox = () => {
     // Retrieve local user data from localStorage
@@ -255,7 +289,7 @@ const AccessBidRoom = () => {
             <i className="fas fa-check-circle text-green-700 text-3xl"></i>
           </div>
           <p className="font-semibold text-lg">
-            Congratulations! You have successfully secured a quantity of {tender.qty} MT at the rate of ₹{Number(lBid).toFixed(2)} CIF to {tender.dest_port}.
+            Congratulations! You have successfully secured a quantity of {tender.qty_split_criteria} MT at the rate of ₹{Number(lBid).toFixed(2)} CIF to {tender.dest_port}.
           </p>
         </div>
       );

@@ -256,6 +256,24 @@ export default function Sidebar() {
         route: "/tenders/sellerSideApplication",
         active: true,
       },
+      {
+        id: 6,
+        icon: "fas fa-file-contract",
+        name: "Reports",
+        route: "/reports/auction-bids",
+        active: true,
+        children: [
+          { id: 1, name: "Auction Bids", route: "/reports/auction-bids" },
+          {
+            id: 2,
+            name: "Tender Allotment",
+            route: "/reports/tender-allotment",
+          },
+          { id: 3, name: "Action Logs", route: "/reports/action-logs" },
+          { id: 4, name: "Bid Allotment", route: "/reports/bid-allotment" },
+          { id: 5, name: "Bid Position", route: "/reports/bid-position" },
+        ],
+      },
     ],
     manager: [
       {
