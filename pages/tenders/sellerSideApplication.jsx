@@ -129,6 +129,9 @@ const SubmittedApplications = () => {
                 className="bg-white shadow-md rounded-lg p-6 mb-4 border border-gray-200"
               >
                 <h2 className="text-xl font-semibold mb-2">Tender ID: {application.tender_id}</h2>
+                <h3>Tender Name : {application.tender_title}</h3>
+                <h3>Buyer Name : {application.first_name + " " + application.last_name}</h3>
+                <h3>Company  : {application.company_name}</h3>
                 <p className="text-lg font-medium mb-2">Status: {application.status}</p>
                 <div className="flex justify-between items-center mt-4">
                   <button

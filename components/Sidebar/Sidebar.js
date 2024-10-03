@@ -269,7 +269,7 @@ export default function Sidebar() {
             name: "Tender Allotment",
             route: "/reports/tender-allotment",
           },
-          { id: 3, name: "Action Logs", route: "/reports/action-logs" },
+          { id: 3, name: "Auction Logs", route: "/reports/auction-logs" },
           { id: 4, name: "Bid Allotment", route: "/reports/bid-allotment" },
           { id: 5, name: "Bid Position", route: "/reports/bid-position" },
         ],

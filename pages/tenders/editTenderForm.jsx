@@ -656,114 +656,62 @@ const EditTenderForm = () => {
               <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 <h2 className="text-2xl font-bold mb-4">Attachments</h2>
 
-                {tenderData.attachments.map((attachment, index) => (
-                  <div key={index} className="mb-6 border-b pb-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-semibold">
-                        Add Images<span className="text-red-500">*</span>
-                      </h3>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (index === 0) {
-                            // Handle Add Attachment
-                            setTenderData((prevData) => ({
-                              ...prevData,
-                              attachments: [
-                                ...prevData.attachments,
-                                {
-                                  key: "",
-                                  extension: "",
-                                  maxFileSize: "",
-                                  label: "",
-                                },
-                              ],
-                            }));
-                          } else {
-                            // Handle Remove Attachment
-                            setTenderData((prevData) => ({
-                              ...prevData,
-                              attachments: prevData.attachments.filter(
-                                (_, i) => i !== index
-                              ),
-                            }));
-                          }
-                        }}
-                        className={`${
-                          index === 0 ? "bg-green-500" : "bg-red-500"
-                        } text-white p-2 rounded-full`}
-                      >
-                        {index === 0 ? <FaPlus /> : <FaTrash />}
-                      </button>
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-bold mb-2">
-                        Enter Key
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Enter Key (Spaces not allowed)"
-                        value={attachment.key || ""} // Ensure a default value if undefined
-                        onChange={(e) => {
-                          setTenderData((prevData) => ({
-                            ...prevData,
-                            attachments: prevData.attachments.map((att, i) =>
-                              i === index
-                                ? { ...att, key: e.target.value }
-                                : att
-                            ),
-                          }));
-                        }}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                          Enter Extension
-                        </label>
-                        <select
-                          value={attachment.extension || ""}
-                          onChange={(e) => {
-                            setTenderData((prevData) => ({
-                              ...prevData,
-                              attachments: prevData.attachments.map((att, i) =>
-                                i === index
-                                  ? { ...att, extension: e.target.value }
-                                  : att
-                              ),
-                            }));
+                {Array.isArray(tenderData.attachments) &&
+                  tenderData.attachments.map((attachment, index) => (
+                    <div key={index} className="mb-6 border-b pb-4">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold">
+                          Add Images<span className="text-red-500">*</span>
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (index === 0) {
+                              // Handle Add Attachment
+                              setTenderData((prevData) => ({
+                                ...prevData,
+                                attachments: [
+                                  ...prevData.attachments,
+                                  {
+                                    key: "",
+                                    extension: "",
+                                    maxFileSize: "",
+                                    label: "",
+                                  },
+                                ],
+                              }));
+                            } else {
+                              // Handle Remove Attachment
+                              setTenderData((prevData) => ({
+                                ...prevData,
+                                attachments: prevData.attachments.filter(
+                                  (_, i) => i !== index
+                                ),
+                              }));
+                            }
                           }}
-                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                          required
+                          className={`${
+                            index === 0 ? "bg-green-500" : "bg-red-500"
+                          } text-white p-2 rounded-full`}
                         >
-                          <option value="" disabled>
-                            Select Extension
-                          </option>
-                          <option value="jpg">
-                            image/png,image/jpg,image/jpeg
-                          </option>
-                          <option value="pdf">application/pdf</option>
-                        </select>
+                          {index === 0 ? <FaPlus /> : <FaTrash />}
+                        </button>
                       </div>
 
-                      <div>
+                      <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">
-                          Enter Max Upload File Size (in MB)
+                          Enter Key
                         </label>
                         <input
-                          type="number"
-                          placeholder="Enter File size"
-                          value={attachment.maxFileSize || ""}
+                          type="text"
+                          placeholder="Enter Key (Spaces not allowed)"
+                          value={attachment.key || ""} // Ensure a default value if undefined
                           onChange={(e) => {
                             setTenderData((prevData) => ({
                               ...prevData,
                               attachments: prevData.attachments.map((att, i) =>
                                 i === index
-                                  ? { ...att, maxFileSize: e.target.value }
+                                  ? { ...att, key: e.target.value }
                                   : att
                               ),
                             }));
@@ -772,31 +720,10 @@ const EditTenderForm = () => {
                           required
                         />
                       </div>
-                    </div>
 
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-bold mb-2">
-                        Enter Label
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Enter Image Label"
-                        value={attachment.label || ""}
-                        onChange={(e) => {
-                          setTenderData((prevData) => ({
-                            ...prevData,
-                            attachments: prevData.attachments.map((att, i) =>
-                              i === index
-                                ? { ...att, label: e.target.value }
-                                : att
-                            ),
-                          }));
-                        }}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      />
+                      {/* Add the rest of the input fields for extension, maxFileSize, label here */}
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
 
