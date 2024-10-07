@@ -66,7 +66,6 @@ const TenderAllotment = () => {
             <thead>
               <tr className="bg-gray-200 text-left text-sm uppercase text-gray-700 font-semibold">
                 <th className="px-4 py-2 border-b text-center">Sno</th>
-                <th className="px-4 py-2 border-b text-center">Sequence</th>
                 <th className="px-4 py-2 border-b">Company Name</th>
                 <th className="px-4 py-2 border-b">Person Name</th>
                 <th className="px-4 py-2 border-b">Contact No</th>
@@ -91,7 +90,6 @@ const TenderAllotment = () => {
                   const [bidDate, bidTime] = bid.created_at.split("T");
                   return (
                     <tr key={bid.bid_id} className="hover:bg-gray-100 transition-all duration-200">
-                      <td className="border px-4 py-2 text-center">{index + 1}</td>
                       <td className="border px-4 py-2 text-center">{index + 1}</td>
                       <td className="border px-4 py-2">{bid.company_name}</td>
                       <td className="border px-4 py-2">{`${bid.first_name} ${bid.last_name}`}</td>

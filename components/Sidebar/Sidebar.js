@@ -257,7 +257,7 @@ export default function Sidebar() {
         active: true,
       },
       {
-        id: 6,
+        id: 5,
         icon: "fas fa-file-contract",
         name: "Reports",
         route: "/reports/auction-bids",
@@ -272,7 +272,22 @@ export default function Sidebar() {
           { id: 3, name: "Auction Logs", route: "/reports/auction-logs" },
           { id: 4, name: "Bid Allotment", route: "/reports/bid-allotment" },
           { id: 5, name: "Bid Position", route: "/reports/bid-position" },
+          { id: 6, name: "Mini Summary", route: "/reports/mini-summary" },
+          { id: 7 , name: "Tender Party Wise", route: "/reports/tender-party-wise" },
+          { id: 8 , name: "Tender Challan", route: "/reports/tender-challan" }
         ],
+      },
+      {
+        id: 6,
+        icon: "fas fa-file-contract",
+        name: "Administrator",
+        route: "/administrator/admin-Management",
+        active: true,
+        children:[
+          {id :1 , name : "Admin Management", route:"/administrator/admin-Management"},
+          {id :2 , name : "User Management", route:"/administrator/user-Management"},
+          {id :3 , name : "Manager Management", route:"/administrator/manager-Management"}
+        ]
       },
     ],
     manager: [
