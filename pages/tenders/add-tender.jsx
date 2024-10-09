@@ -115,6 +115,33 @@ const AddTender = () => {
     setAttachments(newAttachments);
   };
 
+  // Auction for section
+
+  const [auctionFields, setAuctionFields] = useState([
+    { name: "", quantity: "" },
+  ]);
+
+  const [auctionType, setAuctionType] = useState(""); // State to track auction type
+
+  const handleAuctionInputChange = (index, field, value) => {
+    const updatedFields = [...auctionFields];
+    updatedFields[index][field] = value;
+    setAuctionFields(updatedFields);
+  };
+
+  const handleAddAuction = () => {
+    setAuctionFields([...auctionFields, { name: "", quantity: "" }]);
+  };
+
+  const handleRemoveAuction = (index) => {
+    const updatedFields = auctionFields.filter((_, i) => i !== index);
+    setAuctionFields(updatedFields);
+  };
+
+  const handleAuctionTypeChange = (e) => {
+    setAuctionType(e.target.value);
+  };
+
   // custom-form
 
   const [formFields, setFormFields] = useState([]);
@@ -227,8 +254,6 @@ const AddTender = () => {
   const [applicationStart, setApplicationStart] = useState(null);
   const [applicationEnd, setApplicationEnd] = useState(null);
 
-  
-
   const parseDate = (date) => (date ? new Date(date) : null);
   const handleApplicationStartChange = (date) => {
     setApplicationStart(date);
@@ -238,7 +263,7 @@ const AddTender = () => {
   };
 
   const handleApplicationEndChange = (date) => {
-    setApplicationEnd(parseDate(date)); 
+    setApplicationEnd(parseDate(date));
   };
 
   // Helper function to get the minimum time for the end date picker
@@ -262,14 +287,13 @@ const AddTender = () => {
 
     // Generate a random tender_id using current time
     const tender_id = `tender_${new Date().getTime()}`; // Prefixing with 'tender_' to ensure uniqueness
-     
 
     // Prepare form data to send to backend
     const formData = {
       tender_title: name, // Title of the tender
       tender_slug: slug, // URL-friendly version of the title
       tender_desc: description, // Description of the tender
-      tender_cat: 'testing', // Default to 'testing' if not applicable
+      tender_cat: "testing", // Default to 'testing' if not applicable
       tender_opt: isPublished, // Tender option, e.g., publish status
       emd_amt: emdAmount, // EMD Amount
       emt_lvl_amt: emdLevelAmount, // EMD Level Amount
@@ -287,7 +311,9 @@ const AddTender = () => {
       auct_start_time: Math.floor(new Date(auctionStart).getTime() / 1000), // Auction start time as Unix timestamp
       auct_end_time: Math.floor(new Date(auctionEnd).getTime() / 1000), // Auction end time as Unix timestamp
       time_frame_ext: extensionMinutes, // Time frame for extension
-      extended_at: extendedAt ? Math.floor(new Date(extendedAt).getTime() / 1000) : null, // Extended time in Unix timestamp or null
+      extended_at: extendedAt
+        ? Math.floor(new Date(extendedAt).getTime() / 1000)
+        : null, // Extended time in Unix timestamp or null
       amt_of_ext: timeExtension, // Amount of time extension
       aut_auct_ext_bfr_end_time: extensionBeforeEndtime, // Auction extension before end time
       min_decr_bid_val: minDecrementValue, // Minimum decrement bid value
@@ -295,11 +321,11 @@ const AddTender = () => {
       qty_split_criteria: qtySplittingCriteria, // Quantity splitting criteria
       counter_offr_accept_timer: counterOfferTimer, // Counter offer acceptance timer
       img_url: image ? URL.createObjectURL(image) : " ", // Image URL created from the uploaded file
-      auction_type: null, // Set to null if not applicable
-      tender_id: tender_id , // Generate a random tender ID based on the current timestamp if not provided
+      auction_type: auctionType, // Set to null if not applicable
+      tender_id: tender_id, // Generate a random tender ID based on the current timestamp if not provided
       audi_key: null, // Set to null if not applicable
+      auct_field: auctionFields,
     };
-    
 
     console.log("form data here 1", formData);
 
@@ -497,6 +523,11 @@ const AddTender = () => {
                     onChange={(e) => setEmdAmount(e.target.value)}
                     placeholder="Enter EMD Amount"
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    onFocus={(e) =>
+                      e.target.addEventListener("wheel", (event) =>
+                        event.preventDefault()
+                      )
+                    }
                     required
                   />
                 </div>
@@ -518,6 +549,11 @@ const AddTender = () => {
                     onChange={(e) => setEmdLevelAmount(e.target.value)}
                     placeholder="Enter EMD Amount"
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    onFocus={(e) =>
+                      e.target.addEventListener("wheel", (event) =>
+                        event.preventDefault()
+                      )
+                    }
                     required
                   />
                 </div>
@@ -608,6 +644,11 @@ const AddTender = () => {
                             )
                           }
                           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          onFocus={(e) =>
+                            e.target.addEventListener("wheel", (event) =>
+                              event.preventDefault()
+                            )
+                          }
                           required
                         />
                       </div>
@@ -629,6 +670,125 @@ const AddTender = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Auction For */}
+              <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                <h2 className="text-2xl font-bold mb-4">Auction items</h2>
+
+                {auctionFields.map((auction, index) => (
+                  <div key={index} className="mb-6 border-b pb-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">
+                        Auction Details<span className="text-red-500">*</span>
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={
+                          index === 0
+                            ? handleAddAuction
+                            : () => handleRemoveAuction(index)
+                        }
+                        className={`${
+                          index === 0 ? "bg-green-500" : "bg-red-500"
+                        } text-white p-2 rounded-full`}
+                      >
+                        {index === 0 ? <FaPlus /> : <FaTrash />}
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                          Auction Item
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Enter auction item"
+                          value={auction.name}
+                          onChange={(e) =>
+                            handleAuctionInputChange(
+                              index,
+                              "name",
+                              e.target.value
+                            )
+                          }
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                          Quantity of Auction
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="Enter auction quantity"
+                          value={auction.quantity}
+                          onChange={(e) =>
+                            handleAuctionInputChange(
+                              index,
+                              "quantity",
+                              e.target.value
+                            )
+                          }
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          onFocus={(e) =>
+                            e.target.addEventListener("wheel", (event) =>
+                              event.preventDefault()
+                            )
+                          }
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Auction Type Section */}
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    Auction Type<span className="text-red-500">*</span>
+                  </h3>
+                  <div className="mt-4">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        name="auctionType"
+                        value="reverse"
+                        checked={auctionType === "reverse"}
+                        onChange={handleAuctionTypeChange}
+                        className="form-radio text-blue-600"
+                      />
+                      <span className="ml-2">Reverse</span>
+                    </label>
+
+                    <label className="inline-flex items-center ml-6">
+                      <input
+                        type="radio"
+                        name="auctionType"
+                        value="forward"
+                        checked={auctionType === "forward"}
+                        onChange={handleAuctionTypeChange}
+                        className="form-radio text-blue-600"
+                      />
+                      <span className="ml-2">Forward</span>
+                    </label>
+
+                    <label className="inline-flex items-center ml-6">
+                      <input
+                        type="radio"
+                        name="auctionType"
+                        value="other"
+                        checked={auctionType === "other"}
+                        onChange={handleAuctionTypeChange}
+                        className="form-radio text-blue-600"
+                      />
+                      <span className="ml-2">Other</span>
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -733,6 +893,11 @@ const AddTender = () => {
                       onChange={(e) => setStartingPrice(e.target.value)}
                       placeholder="Enter Starting Price"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      onFocus={(e) =>
+                        e.target.addEventListener("wheel", (event) =>
+                          event.preventDefault()
+                        )
+                      }
                       required
                     />
                   </div>
@@ -751,6 +916,11 @@ const AddTender = () => {
                       onChange={(e) => setQuantity(e.target.value)}
                       placeholder="Enter Quantity"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      onFocus={(e) =>
+                        e.target.addEventListener("wheel", (event) =>
+                          event.preventDefault()
+                        )
+                      }
                       required
                     />
                   </div>
@@ -930,6 +1100,11 @@ const AddTender = () => {
                       onChange={(e) => setExtensionMinutes(e.target.value)}
                       placeholder="Enter Auto Auction Extension Minutes"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      onFocus={(e) =>
+                        e.target.addEventListener("wheel", (event) =>
+                          event.preventDefault()
+                        )
+                      }
                       required
                     />
                   </div>
@@ -970,6 +1145,11 @@ const AddTender = () => {
                       onChange={(e) => setTimeExtension(e.target.value)}
                       placeholder="Enter Auto Auction Extension Number Time"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      onFocus={(e) =>
+                        e.target.addEventListener("wheel", (event) =>
+                          event.preventDefault()
+                        )
+                      }
                       required
                     />
                   </div>
@@ -991,6 +1171,11 @@ const AddTender = () => {
                       }
                       placeholder="Enter Auto Auction Extension Before Endtime"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      onFocus={(e) =>
+                        e.target.addEventListener("wheel", (event) =>
+                          event.preventDefault()
+                        )
+                      }
                       required
                     />
                   </div>
@@ -1009,6 +1194,11 @@ const AddTender = () => {
                       onChange={(e) => setMinDecrementValue(e.target.value)}
                       placeholder="Enter Counter Offer Acceptance Timer"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      onFocus={(e) =>
+                        e.target.addEventListener("wheel", (event) =>
+                          event.preventDefault()
+                        )
+                      }
                       required
                     />
                   </div>
@@ -1028,6 +1218,11 @@ const AddTender = () => {
                       onChange={(e) => setTimerExtendedValue(e.target.value)}
                       placeholder="Enter Timer Extended Value"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      onFocus={(e) =>
+                        e.target.addEventListener("wheel", (event) =>
+                          event.preventDefault()
+                        )
+                      }
                       required
                     />
                   </div>
@@ -1048,6 +1243,11 @@ const AddTender = () => {
                       onChange={(e) => setQtySplittingCriteria(e.target.value)}
                       placeholder="Enter Qty Splitting Criteria"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      onFocus={(e) =>
+                        e.target.addEventListener("wheel", (event) =>
+                          event.preventDefault()
+                        )
+                      }
                       required
                     />
                   </div>
@@ -1067,6 +1267,11 @@ const AddTender = () => {
                       onChange={(e) => setCounterOfferTimer(e.target.value)}
                       placeholder="Enter Counter Offer Acceptance Timer"
                       className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      onFocus={(e) =>
+                        e.target.addEventListener("wheel", (event) =>
+                          event.preventDefault()
+                        )
+                      }
                       required
                     />
                   </div>

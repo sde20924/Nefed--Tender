@@ -107,28 +107,30 @@ const AccessBidRoom = () => {
     }
   };
 
-  // Function to check auction status and calculate countdown
-  const checkAuctionStatus = (startTime, endTime) => {
-    const now = new Date().getTime();
-    const startTimeMs = startTime * 1000;
-    const endTimeMs = endTime * 1000;
-
-    if (now >= startTimeMs && now <= endTimeMs) {
-      setIsAuctionLive(true);
-      calculateTimeLeft(endTimeMs); // Countdown to auction end time
-    } else if (now < startTimeMs) {
-      setIsAuctionLive(false);
-      calculateTimeLeft(startTimeMs); // Countdown to auction start time
-    } else {
-      setIsAuctionLive(false);
-      setAuctionEnded(true); // Auction has ended
-      setTimeLeft("Auction is closed");
-      // Automatically announce the winner when auction ends
-      // if (lBidUserId) {
-        announceWinner();
-      // }
+  useEffect(() => {
+    if (auctionEnded && lBidUserId) {
+      announceWinner();
     }
-  };
+  }, [auctionEnded, lBidUserId]);
+
+ // Function to check auction status and calculate countdown
+const checkAuctionStatus = (startTime, endTime) => {
+  const now = new Date().getTime();
+  const startTimeMs = startTime * 1000;
+  const endTimeMs = endTime * 1000;
+
+  if (now >= startTimeMs && now <= endTimeMs) {
+    setIsAuctionLive(true);
+    calculateTimeLeft(endTimeMs); // Countdown to auction end time
+  } else if (now < startTimeMs) {
+    setIsAuctionLive(false);
+    calculateTimeLeft(startTimeMs); // Countdown to auction start time
+  } else {
+    setIsAuctionLive(false);
+    setAuctionEnded(true); // Auction has ended
+    setTimeLeft("Auction is closed");
+  }
+};
 
   // Function to calculate countdown time
   const calculateTimeLeft = (targetTimeMs) => {
@@ -200,41 +202,58 @@ const AccessBidRoom = () => {
   };
 
   // Handle bid submission
-  const handlePlaceBid = () => {
-    // Find the lowest bid
-    const lowestBid =
-      bids.length > 0
-        ? bids.reduce((lowest, bid) =>
-            bid.bid_amount < lowest.bid_amount ? bid : lowest
-          )
-        : null;
+  // Handle bid submission
+const handlePlaceBid = () => {
+  // Ensure the minimum bid is set in the tender details
+  if (!tender || typeof tender.start_price === "undefined") {
+    toast.error("Tender minimum bid price is not available.");
+    return;
+  }
 
-    // Ensure the user's bid is lower than or equal to the lowest bid
-    if (lowestBid && bidAmount >= lowestBid.bid_amount) {
-      toast.error(
-        `Your bid must be lower than the current lowest bid of ₹${Number(lowestBid.bid_amount).toFixed(
-          2
-        )}.`
-      );
-      return;
-    }
+  // Check if the first bid is higher than the minimum starting price
+  if (bids.length === 0 && bidAmount > tender.start_price) {
+    toast.error(`Your bid must be equal to or lower than the minimum starting bid of ₹${tender.start_price.toFixed(2)}.`);
+    return;
+  }
 
-    if (!bidAmount) {
-      toast.error("Please enter a bid amount.");
-      return;
-    }
+  // Find the lowest bid
+  const lowestBid = bids.length > 0
+    ? bids.reduce((lowest, bid) => bid.bid_amount < lowest.bid_amount ? bid : lowest)
+    : null;
 
-    submitBid(); // Call the function to submit the bid
-    setFobAmount("");
-    setFreightAmount("");
-    setBidAmount(0);
-    setAmountInWords("");
-  };
+  // Ensure the user's bid is lower than the lowest bid if there's already a bid placed
+  if (lowestBid && bidAmount >= lowestBid.bid_amount) {
+    toast.error(
+      `Your bid must be lower than the current lowest bid of ₹${Number(lowestBid.bid_amount).toFixed(2)}.`
+    );
+    return;
+  }
+
+  // Ensure bid amount is provided
+  if (!bidAmount || bidAmount <= 0) {
+    toast.error("Please enter a valid bid amount.");
+    return;
+  }
+
+  // Submit the bid
+  submitBid(); // Call the function to submit the bid
+  setFobAmount("");
+  setFreightAmount("");
+  setBidAmount(0);
+  setAmountInWords("");
+};
+
 
   //winner announce than update the table 
 
   const announceWinner = async () => {
     try {
+      // Ensure lBidUserId and tender are defined
+      if (!lBidUserId || !tender) {
+        console.error("No lowest bid user ID or tender data available.");
+        return;
+      }
+  
       // Create the formData object with necessary details
       const formData = {
         winner_user_id: lBidUserId,
@@ -377,6 +396,11 @@ const AccessBidRoom = () => {
                     onChange={handleFobChange}
                     placeholder="Enter FOB Amount"
                     className="flex-1 p-2 border border-gray-300 rounded"
+                    onFocus={(e) =>
+                      e.target.addEventListener("wheel", (event) =>
+                        event.preventDefault()
+                      )
+                    }
                   />
                   <span className="text-gray-500 ml-2">per</span>
                 </div>
@@ -395,6 +419,11 @@ const AccessBidRoom = () => {
                     onChange={handleFreightChange}
                     placeholder="Enter Freight , Insurance Amount"
                     className="flex-1 p-2 border border-gray-300 rounded"
+                    onFocus={(e) =>
+                      e.target.addEventListener("wheel", (event) =>
+                        event.preventDefault()
+                      )
+                    }
                   />
                   <span className="text-gray-500 ml-2">per</span>
                 </div>
@@ -480,6 +509,10 @@ const AccessBidRoom = () => {
 
           <h5 className="text-lg font-bold mb-2 text-center">Tender Details</h5>
           <div className="mb-2 divide-y">
+          <div className="flex justify-between mb-2">
+              <span>Minimum bid : </span>
+              <span>{tender.start_price}</span>
+            </div>
             <div className="flex justify-between mb-2">
               <span>Quantity:</span>
               <span>{tender.qty}</span>

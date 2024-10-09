@@ -289,6 +289,22 @@ export default function Sidebar() {
           {id :3 , name : "Manager Management", route:"/administrator/manager-Management"}
         ]
       },
+      {
+        id: 7,
+        icon: "fas fa-file-contract",
+        name: "Content Management",
+        route: "/content-management/slider-group",
+        active: true,
+        children: [
+          {
+            id: 1,
+            name: "Slider Group",
+            route: "/content-management/slider-group",
+          },
+          { id: 2, name: "Paragraph Content", route: "/content-management/paragraph-content"},
+          { id: 3, name: "Pages", route: "/content-management/page" },
+        ],
+      },
     ],
     manager: [
       {
