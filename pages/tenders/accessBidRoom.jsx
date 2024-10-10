@@ -6,75 +6,53 @@ import { callApiGet, callApiPost } from "@/utils/FetchApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// Function to convert numbers to words
-const numberToWords = (num) => {
-  const a = [
-    "",
-    "one",
-    "two",
-    "three",
-    "four",
-    "five",
-    "six",
-    "seven",
-    "eight",
-    "nine",
-    "ten",
-    "eleven",
-    "twelve",
-    "thirteen",
-    "fourteen",
-    "fifteen",
-    "sixteen",
-    "seventeen",
-    "eighteen",
-    "nineteen",
-  ];
-  const b = [
-    "",
-    "",
-    "twenty",
-    "thirty",
-    "forty",
-    "fifty",
-    "sixty",
-    "seventy",
-    "eighty",
-    "ninety",
-  ];
-  if (num < 20) return a[num];
-  if (num < 100)
-    return b[Math.floor(num / 10)] + (num % 10 !== 0 ? "-" + a[num % 10] : "");
-  if (num < 1000)
-    return (
-      a[Math.floor(num / 100)] +
-      " hundred" +
-      (num % 100 !== 0 ? " and " + numberToWords(num % 100) : "")
-    );
-  return num;
-};
+
 
 const AccessBidRoom = () => {
   const router = useRouter();
   const { tenderId } = router.query; // Get the tenderId from the query parameters
   const [tender, setTender] = useState(null);
-  const [timeLeft, setTimeLeft] = useState("");
+  const [timeLeft, setTimeLeft] = useState(""); // Countdown timer
   const [isAuctionLive, setIsAuctionLive] = useState(false); // State to track if the auction is live
   const [auctionEnded, setAuctionEnded] = useState(false); // New state to track if auction has ended
-  const [bidAmount, setBidAmount] = useState(0);
-  const [fobAmount, setFobAmount] = useState("");
-  const [freightAmount, setFreightAmount] = useState("");
-  const [amountInWords, setAmountInWords] = useState("");
   const [bids, setBids] = useState([]); // State to store all bids
-  const [lBidUserId,setLBidsUserId] = useState();
-  const [lBid,setLBid]=useState();
+  const [lBidUserId, setLBidsUserId] = useState();
+  const [lBid, setLBid] = useState();
+
+  const [auctionItems, setAuctionItems] = useState([]); // State to store auction items
+  const [itemBids, setItemBids] = useState({}); // Store user input for each item
+  const [totalBidAmount, setTotalBidAmount] = useState(0); // Store the total bid amount
 
   useEffect(() => {
     if (tenderId) {
-      fetchTenderDetails(); // Fetch tender details when tenderId is available
-      fetchBids(); // Fetch bids when tenderId is available
+      fetchTenderDetails();
+      fetchBids();
+      fetchAuctionItems(); // Fetch auction items when tenderId is available
     }
   }, [tenderId]);
+
+  // Fetch auction items
+  const fetchAuctionItems = async () => {
+    try {
+      const response = await callApiGet(
+        `/get-tender-auction-items/${tenderId}`
+      );
+
+      // Check if auction_items array exists and is not empty
+      if (
+        response &&
+        response.auction_items &&
+        response.auction_items.length > 0
+      ) {
+        setAuctionItems(response.auction_items); // Set auction items data
+      } else {
+        toast.error("No auction items found.");
+      }
+    } catch (error) {
+      console.error("Error fetching auction items:", error.message);
+      toast.error("Error fetching auction items.");
+    }
+  };
 
   // Fetch tender details
   const fetchTenderDetails = async () => {
@@ -94,13 +72,10 @@ const AccessBidRoom = () => {
   const fetchBids = async () => {
     try {
       const response = await callApiGet(`/tender/bid/${tenderId}`); // Fetch bids by tender ID
-      // console.log(response.lowestBid);
-      // console.log(response.lowestBid.user_id);
-      // const lowestBidUserId= response.lowestBid.user_id;
       if (response.success) {
         setBids(response.allBids); // Set all bids data
         setLBidsUserId(response.lowestBid.user_id);
-        setLBid(response.lowestBid.bid_amount)
+        setLBid(response.lowestBid.bid_amount);
       }
     } catch (error) {
       console.error("Error fetching bids:", error.message);
@@ -113,24 +88,24 @@ const AccessBidRoom = () => {
     }
   }, [auctionEnded, lBidUserId]);
 
- // Function to check auction status and calculate countdown
-const checkAuctionStatus = (startTime, endTime) => {
-  const now = new Date().getTime();
-  const startTimeMs = startTime * 1000;
-  const endTimeMs = endTime * 1000;
+  // Function to check auction status and calculate countdown
+  const checkAuctionStatus = (startTime, endTime) => {
+    const now = new Date().getTime();
+    const startTimeMs = startTime * 1000;
+    const endTimeMs = endTime * 1000;
 
-  if (now >= startTimeMs && now <= endTimeMs) {
-    setIsAuctionLive(true);
-    calculateTimeLeft(endTimeMs); // Countdown to auction end time
-  } else if (now < startTimeMs) {
-    setIsAuctionLive(false);
-    calculateTimeLeft(startTimeMs); // Countdown to auction start time
-  } else {
-    setIsAuctionLive(false);
-    setAuctionEnded(true); // Auction has ended
-    setTimeLeft("Auction is closed");
-  }
-};
+    if (now >= startTimeMs && now <= endTimeMs) {
+      setIsAuctionLive(true);
+      calculateTimeLeft(endTimeMs); // Countdown to auction end time
+    } else if (now < startTimeMs) {
+      setIsAuctionLive(false);
+      calculateTimeLeft(startTimeMs); // Countdown to auction start time
+    } else {
+      setIsAuctionLive(false);
+      setAuctionEnded(true); // Auction has ended
+      setTimeLeft("Auction is closed");
+    }
+  };
 
   // Function to calculate countdown time
   const calculateTimeLeft = (targetTimeMs) => {
@@ -158,25 +133,60 @@ const checkAuctionStatus = (startTime, endTime) => {
     return () => clearInterval(interval); // Cleanup interval on component unmount
   };
 
-  // Handle FOB amount change
-  const handleFobChange = (e) => {
-    const value = parseFloat(e.target.value) || 0;
-    setFobAmount(value);
-    updateBidAmount(value, freightAmount);
+  // Handle input change for each auction item
+  const handleInputChange = (index, value) => {
+    const newBids = { ...itemBids, [index]: value }; // Update the user input for each item
+    setItemBids(newBids);
+
+    // Calculate the total bid amount (quantity * user input)
+    let sum = 0;
+    Object.keys(newBids).forEach((key) => {
+      const bidValue = parseFloat(newBids[key]) || 0;
+      const itemQuantity = parseFloat(auctionItems[key]?.auct_qty) || 0;
+      sum += bidValue * itemQuantity; // Multiply user input by item quantity
+    });
+    setTotalBidAmount(sum); // Update the total bid amount
   };
 
-  // Handle Freight amount change
-  const handleFreightChange = (e) => {
-    const value = parseFloat(e.target.value) || 0;
-    setFreightAmount(value);
-    updateBidAmount(fobAmount, value);
+  // Render auction items with input fields
+  const renderAuctionItems = () => {
+    return auctionItems.map((item, index) => (
+      <div
+        key={index}
+        className="grid grid-cols-3 gap-4 items-center mb-4 p-4 border rounded-lg bg-gray-100"
+      >
+        {/* First column: Item name */}
+        <div className="text-gray-700 font-semibold">
+          {item.auct_item.trim()}
+        </div>
+
+        {/* Second column: Quantity of item */}
+        <div className="text-gray-700">{item.auct_qty}</div>
+
+        {/* Third column: Input field for entering a number */}
+        <div>
+          <input
+            type="number"
+            placeholder="Enter your bid"
+            className="p-2 border border-gray-300 rounded w-full"
+            value={itemBids[index] || ""}
+            onChange={(e) => handleInputChange(index, e.target.value)}
+          />
+        </div>
+      </div>
+    ));
   };
 
-  // Update bid amount and amount in words
-  const updateBidAmount = (fob, freight) => {
-    const total = fob + freight;
-    setBidAmount(total);
-    setAmountInWords(numberToWords(total));
+  // Handle bid submission
+  const handlePlaceBid = () => {
+    // Ensure bid amount is provided
+    if (totalBidAmount <= 0) {
+      toast.error("Please enter valid bid amounts.");
+      return;
+    }
+
+    // Submit the bid
+    submitBid(); // Call the function to submit the bid
   };
 
   // Function to submit the bid to the server
@@ -184,13 +194,11 @@ const checkAuctionStatus = (startTime, endTime) => {
     try {
       const response = await callApiPost("bid/submit", {
         tender_id: tenderId, // Pass the tender ID
-        bid_amount: bidAmount,  // Pass the bid amount
-        fob_amount : fobAmount,  
-        freight_amount : freightAmount
+        bid_amount: totalBidAmount, // Pass the total bid amount
       });
 
       if (response.success) {
-        toast.success(`Bid of ₹${bidAmount} placed successfully.`);
+        toast.success(`Bid of ₹${totalBidAmount} placed successfully.`);
         fetchBids(); // Refresh the bid list after placing a bid
       } else {
         toast.error("Failed to place bid. Please try again.");
@@ -201,51 +209,7 @@ const checkAuctionStatus = (startTime, endTime) => {
     }
   };
 
-  // Handle bid submission
-  // Handle bid submission
-const handlePlaceBid = () => {
-  // Ensure the minimum bid is set in the tender details
-  if (!tender || typeof tender.start_price === "undefined") {
-    toast.error("Tender minimum bid price is not available.");
-    return;
-  }
-
-  // Check if the first bid is higher than the minimum starting price
-  if (bids.length === 0 && bidAmount > tender.start_price) {
-    toast.error(`Your bid must be equal to or lower than the minimum starting bid of ₹${tender.start_price.toFixed(2)}.`);
-    return;
-  }
-
-  // Find the lowest bid
-  const lowestBid = bids.length > 0
-    ? bids.reduce((lowest, bid) => bid.bid_amount < lowest.bid_amount ? bid : lowest)
-    : null;
-
-  // Ensure the user's bid is lower than the lowest bid if there's already a bid placed
-  if (lowestBid && bidAmount >= lowestBid.bid_amount) {
-    toast.error(
-      `Your bid must be lower than the current lowest bid of ₹${Number(lowestBid.bid_amount).toFixed(2)}.`
-    );
-    return;
-  }
-
-  // Ensure bid amount is provided
-  if (!bidAmount || bidAmount <= 0) {
-    toast.error("Please enter a valid bid amount.");
-    return;
-  }
-
-  // Submit the bid
-  submitBid(); // Call the function to submit the bid
-  setFobAmount("");
-  setFreightAmount("");
-  setBidAmount(0);
-  setAmountInWords("");
-};
-
-
-  //winner announce than update the table 
-
+  //winner announce than update the table
   const announceWinner = async () => {
     try {
       // Ensure lBidUserId and tender are defined
@@ -253,7 +217,7 @@ const handlePlaceBid = () => {
         console.error("No lowest bid user ID or tender data available.");
         return;
       }
-  
+
       // Create the formData object with necessary details
       const formData = {
         winner_user_id: lBidUserId,
@@ -261,10 +225,13 @@ const handlePlaceBid = () => {
         round: 1,
         status: "sold",
       };
-  
+
       // Call the API using callApiPost function
-      const response = await callApiPost(`tender/announce-winner/${tenderId}`, formData);
-  
+      const response = await callApiPost(
+        `tender/announce-winner/${tenderId}`,
+        formData
+      );
+ 
       if (response.success) {
         toast.success("Winner announced successfully!");
         fetchBids(); // Refresh the bid list to see updated status
@@ -276,7 +243,6 @@ const handlePlaceBid = () => {
       toast.error("Error announcing winner. Please try again.");
     }
   };
-  
 
   // Render the position box showing the lowest bid or L1 status
   const renderPositionBox = () => {
@@ -296,9 +262,7 @@ const handlePlaceBid = () => {
     );
 
     // Check if the logged-in user has the lowest bid (L1)
-    // const isL1 = lowestBid && lowestBid.user_id === loggedInUserId;
-      const isL1= lBidUserId  === loggedInUserId;
-    
+    const isL1 = lBidUserId === loggedInUserId;
 
     // If the auction has ended and the user is L1
     if (auctionEnded && isL1) {
@@ -308,7 +272,9 @@ const handlePlaceBid = () => {
             <i className="fas fa-check-circle text-green-700 text-3xl"></i>
           </div>
           <p className="font-semibold text-lg">
-            Congratulations! You have successfully secured a quantity of {tender.qty_split_criteria} MT at the rate of ₹{Number(lBid).toFixed(2)} CIF to {tender.dest_port}.
+            Congratulations! You have successfully secured a quantity of{" "}
+            {tender.qty_split_criteria} MT at the rate of ₹
+            {Number(lBid).toFixed(2)} CIF to {tender.dest_port}.
           </p>
         </div>
       );
@@ -319,7 +285,9 @@ const handlePlaceBid = () => {
       <div className="border rounded-lg p-4 mb-4">
         <h4 className="text-lg font-semibold mb-2 text-center">Position Box</h4>
         {isAuctionLive ? (
-          <p className={`p-2 rounded-lg ${isL1 ? "bg-green-100 text-green-800 text-center" : "bg-white text-gray-800"}`}>
+          <p
+            className={`p-2 rounded-lg ${isL1 ? "bg-green-100 text-green-800 text-center" : "bg-white text-gray-800"}`}
+          >
             {isL1
               ? `You are L1, your Bid value is: ₹${Number(lBid).toFixed(2)} per unit.`
               : `Lowest Bid Value: ₹${Number(lBid).toFixed(2)} per unit.`}
@@ -380,86 +348,34 @@ const handlePlaceBid = () => {
 
           {isAuctionLive && (
             <div className="mt-4 p-4 border rounded bg-gray-100">
-              <h5 className="text-lg font-bold mb-2">Bid Amount (in INR)</h5>
-              <div className="flex flex-col space-y-4">
-                <div className="flex items-center">
-                  <span className="text-gray-500 mr-2">₹</span>
-                  <label
-                    className="whitespace-nowrap text-sm font-medium text-gray-700"
-                    style={{ width: "150px" }}
-                  >
-                    FOB Amount
-                  </label>
-                  <input
-                    type="number"
-                    value={fobAmount}
-                    onChange={handleFobChange}
-                    placeholder="Enter FOB Amount"
-                    className="flex-1 p-2 border border-gray-300 rounded"
-                    onFocus={(e) =>
-                      e.target.addEventListener("wheel", (event) =>
-                        event.preventDefault()
-                      )
-                    }
-                  />
-                  <span className="text-gray-500 ml-2">per</span>
-                </div>
+              <h5 className="text-lg font-bold mb-2">Auction Items</h5>
+              {renderAuctionItems()} {/* Render the auction items */}
 
-                <div className="flex items-center">
-                  <span className="text-gray-500 mr-2">₹</span>
-                  <label
-                    className="whitespace-nowrap text-sm font-medium text-gray-700"
-                    style={{ width: "150px" }}
-                  >
-                    Freight, Insurance Am.
-                  </label>
-                  <input
-                    type="number"
-                    value={freightAmount}
-                    onChange={handleFreightChange}
-                    placeholder="Enter Freight , Insurance Amount"
-                    className="flex-1 p-2 border border-gray-300 rounded"
-                    onFocus={(e) =>
-                      e.target.addEventListener("wheel", (event) =>
-                        event.preventDefault()
-                      )
-                    }
-                  />
-                  <span className="text-gray-500 ml-2">per</span>
-                </div>
-
-                <div className="flex items-center">
-                  <span className="text-gray-500 mr-2">₹</span>
-                  <label
-                    className="whitespace-nowrap text-sm font-medium text-gray-700"
-                    style={{ width: "150px" }}
-                  >
-                    Bid Amount
-                  </label>
-                  <input
-                    type="text"
-                    value={bidAmount}
-                    readOnly
-                    className="flex-1 p-2 border border-gray-300 bg-gray-100 rounded"
-                    placeholder="Bid Amount"
-                  />
-                  <span className="text-gray-500 ml-2">per</span>
-                </div>
-
-                <div className="mt-2 text-sm text-gray-700">
-                  <b>Amount in Words:</b> {amountInWords}
-                </div>
-
-                <button
-                  onClick={handlePlaceBid}
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+              {/* Display the total bid amount */}
+              <div className="flex items-center mt-4">
+                <span className="text-gray-500 mr-2">₹</span>
+                <label
+                  className="whitespace-nowrap text-sm font-medium text-gray-700"
+                  style={{ width: "150px" }}
                 >
-                  Place Bid
-                </button>
+                  Total Bid Amount
+                </label>
+                <input
+                  type="text"
+                  value={totalBidAmount.toFixed(2)} // Total bid amount from state
+                  readOnly
+                  className="flex-1 p-2 border border-gray-300 bg-gray-100 rounded"
+                  placeholder="Bid Amount"
+                />
               </div>
-              <div className="text-center bg-blue-100 text-sm mt-4">
-                <b> Use Chrome or Safari Browser for better experience.</b>
-              </div>
+
+              {/* Place Bid Button */}
+              <button
+                onClick={handlePlaceBid} // Using the existing place bid handler
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+              >
+                Place Bid
+              </button>
             </div>
           )}
         </div>
@@ -509,7 +425,7 @@ const handlePlaceBid = () => {
 
           <h5 className="text-lg font-bold mb-2 text-center">Tender Details</h5>
           <div className="mb-2 divide-y">
-          <div className="flex justify-between mb-2">
+            <div className="flex justify-between mb-2">
               <span>Minimum bid : </span>
               <span>{tender.start_price}</span>
             </div>

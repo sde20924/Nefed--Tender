@@ -118,7 +118,7 @@ const AddTender = () => {
   // Auction for section
 
   const [auctionFields, setAuctionFields] = useState([
-    { name: "", quantity: "" },
+    { name: "", quantity: ""},
   ]);
 
   const [auctionType, setAuctionType] = useState(""); // State to track auction type

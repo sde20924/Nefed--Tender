@@ -9,7 +9,10 @@ const updatePages  = ()=>{
         subTitle={"update pages the pages of website"}
         title={"update pages"}
       />
-        <h1>Pages </h1>
+      <h1>pages </h1>
+        <div className="">
+
+        </div>
        
         </>
     )
